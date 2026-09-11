@@ -1,0 +1,464 @@
+import java.util.Scanner;
+
+// Song class
+class Song {
+
+    private String songId;
+    private String songTitle;
+    private String artist;
+    private String duration;
+
+    public Song(String songId, String songTitle, String artist, String duration) {
+        this.songId = songId;
+        this.songTitle = songTitle;
+        this.artist = artist;
+        this.duration = duration;
+    }
+
+    public String getSongId() {
+        return songId;
+    }
+
+    public String getSongTitle() {
+        return songTitle;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public void display() {
+        System.out.println("Song ID    : " + songId);
+        System.out.println("Song Title : " + songTitle);
+        System.out.println("Artist     : " + artist);
+        System.out.println("Duration   : " + duration);
+    }
+}
+
+// Node class
+class Node {
+
+    Song song;
+    Node next;
+
+    public Node(Song song) {
+        this.song = song;
+        this.next = null;
+    }
+}
+
+// Singly Linked List ADT
+class LinkedListADT {
+
+    private Node head;
+    private int size;
+
+    public LinkedListADT() {
+        head = null;
+        size = 0;
+    }
+
+    // Add song at the beginning
+    public void insertFirst(Song song) {
+        Node newNode = new Node(song);
+
+        newNode.next = head;
+        head = newNode;
+
+        size++;
+    }
+
+    // Add song at the end
+    public void insertLast(Song song) {
+        Node newNode = new Node(song);
+
+        if (head == null) {
+            head = newNode;
+        } else {
+            Node current = head;
+
+            while (current.next != null) {
+                current = current.next;
+            }
+
+            current.next = newNode;
+        }
+
+        size++;
+    }
+
+    // Insert song at a specific position
+    public boolean insertAt(Song song, int position) {
+
+        if (position < 1 || position > size + 1) {
+            return false;
+        }
+
+        if (position == 1) {
+            insertFirst(song);
+            return true;
+        }
+
+        Node newNode = new Node(song);
+        Node current = head;
+
+        // Move to the node before the desired position
+        for (int i = 1; i < position - 1; i++) {
+            current = current.next;
+        }
+
+        newNode.next = current.next;
+        current.next = newNode;
+
+        size++;
+
+        return true;
+    }
+
+    // Search song by Song ID
+    public Song search(String songId) {
+        Node current = head;
+
+        while (current != null) {
+            if (current.song.getSongId().equalsIgnoreCase(songId)) {
+                return current.song;
+            }
+
+            current = current.next;
+        }
+
+        return null;
+    }
+
+    // Remove song by Song ID
+    public boolean delete(String songId) {
+        if (head == null) {
+            return false;
+        }
+
+        // If the song to remove is the first node
+        if (head.song.getSongId().equalsIgnoreCase(songId)) {
+            head = head.next;
+            size--;
+            return true;
+        }
+
+        Node current = head;
+
+        while (current.next != null) {
+
+            if (current.next.song.getSongId().equalsIgnoreCase(songId)) {
+                current.next = current.next.next;
+                size--;
+                return true;
+            }
+
+            current = current.next;
+        }
+
+        return false;
+    }
+
+    // Display playlist
+    public void display() {
+
+        if (isEmpty()) {
+            System.out.println("\nPlaylist is empty.");
+            return;
+        }
+
+        Node current = head;
+        int number = 1;
+
+        System.out.println("\n========== MUSIC PLAYLIST ==========");
+
+        while (current != null) {
+            System.out.println("\nSong " + number);
+            System.out.println("------------------------------------");
+            current.song.display();
+
+            current = current.next;
+            number++;
+        }
+
+        System.out.println("------------------------------------");
+        System.out.println("Total Songs: " + size);
+        System.out.println("====================================");
+    }
+
+    // Return playlist size
+    public int size() {
+        return size;
+    }
+
+    // Check if playlist is empty
+    public boolean isEmpty() {
+        return head == null;
+    }
+}
+
+// Main class
+public class MusicPlaylistManager {
+
+    static Scanner scanner = new Scanner(System.in);
+    static LinkedListADT playlist = new LinkedListADT();
+
+    public static void main(String[] args) {
+
+        int choice;
+
+        do {
+            displayMenu();
+
+            choice = getIntInput("Enter your choice: ");
+
+            switch (choice) {
+
+                case 1:
+                    addSongAtBeginning();
+                    break;
+
+                case 2:
+                    addSongAtEnd();
+                    break;
+
+                case 3:
+                    insertSongAtPosition();
+                    break;
+
+                case 4:
+                    playlist.display();
+                    break;
+
+                case 5:
+                    searchSong();
+                    break;
+
+                case 6:
+                    removeSong();
+                    break;
+
+                case 7:
+                    displayPlaylistSize();
+                    break;
+
+                case 8:
+                    System.out.println("\nThank you for using Music Playlist Manager!");
+                    break;
+
+                default:
+                    System.out.println("\nInvalid choice. Please select 1-8.");
+            }
+
+        } while (choice != 8);
+
+        scanner.close();
+    }
+
+    // Display menu
+    public static void displayMenu() {
+
+        System.out.println("\n================================");
+        System.out.println("     MUSIC PLAYLIST MANAGER");
+        System.out.println("================================");
+        System.out.println("1. Add Song at Beginning");
+        System.out.println("2. Add Song at End");
+        System.out.println("3. Insert Song at Position");
+        System.out.println("4. Display Playlist");
+        System.out.println("5. Search Song");
+        System.out.println("6. Remove Song");
+        System.out.println("7. Display Playlist Size");
+        System.out.println("8. Exit");
+        System.out.println("================================");
+    }
+
+    // Create a song using user input
+    public static Song createSong() {
+
+        String songId;
+
+        // Validate unique Song ID
+        while (true) {
+
+            songId = getStringInput("Enter Song ID: ");
+
+            if (songId.isEmpty()) {
+                System.out.println("Song ID cannot be empty.");
+            } else if (playlist.search(songId) != null) {
+                System.out.println("Song ID already exists. Please enter another ID.");
+            } else {
+                break;
+            }
+        }
+
+        String songTitle = getStringInput("Enter Song Title: ");
+        String artist = getStringInput("Enter Artist: ");
+        String duration = getStringInput("Enter Duration: ");
+
+        return new Song(songId, songTitle, artist, duration);
+    }
+
+    // Add song at beginning
+    public static void addSongAtBeginning() {
+
+        System.out.println("\n====== ADD SONG AT BEGINNING ======");
+
+        Song song = createSong();
+
+        playlist.insertFirst(song);
+
+        System.out.println("\nSong added successfully at the beginning!");
+    }
+
+    // Add song at end
+    public static void addSongAtEnd() {
+
+        System.out.println("\n========= ADD SONG AT END =========");
+
+        Song song = createSong();
+
+        playlist.insertLast(song);
+
+        System.out.println("\nSong added successfully at the end!");
+    }
+
+    // Insert song at a specific position
+    public static void insertSongAtPosition() {
+
+        System.out.println("\n====== INSERT SONG AT POSITION ======");
+
+        int position;
+
+        while (true) {
+
+            position = getIntInput(
+                    "Enter position (1-" + (playlist.size() + 1) + "): "
+            );
+
+            if (position >= 1 && position <= playlist.size() + 1) {
+                break;
+            }
+
+            System.out.println("Invalid position.");
+        }
+
+        Song song = createSong();
+
+        playlist.insertAt(song, position);
+
+        System.out.println("\nSong inserted successfully!");
+    }
+
+    // Search song
+    public static void searchSong() {
+
+        System.out.println("\n========== SEARCH SONG ==========");
+
+        String songId = getStringInput("Enter Song ID to search: ");
+
+        Song song = playlist.search(songId);
+
+        if (song != null) {
+
+            System.out.println("\nSong found!");
+            System.out.println("------------------------------------");
+
+            song.display();
+
+            System.out.println("------------------------------------");
+
+        } else {
+
+            System.out.println("\nSong not found.");
+        }
+    }
+
+    // Remove song
+    public static void removeSong() {
+
+        System.out.println("\n========== REMOVE SONG ==========");
+
+        String songId = getStringInput("Enter Song ID to remove: ");
+
+        Song song = playlist.search(songId);
+
+        if (song == null) {
+
+            System.out.println("\nSong not found.");
+            return;
+        }
+
+        System.out.println("\nSong to be removed:");
+        System.out.println("------------------------------------");
+
+        song.display();
+
+        System.out.println("------------------------------------");
+
+        String confirmation;
+
+        while (true) {
+
+            confirmation = getStringInput(
+                    "Are you sure you want to remove this song? (Y/N): "
+            );
+
+            if (confirmation.equalsIgnoreCase("Y")) {
+
+                playlist.delete(songId);
+
+                System.out.println("\nSong removed successfully!");
+                break;
+
+            } else if (confirmation.equalsIgnoreCase("N")) {
+
+                System.out.println("\nRemove operation cancelled.");
+                break;
+
+            } else {
+
+                System.out.println("Please enter Y or N.");
+            }
+        }
+    }
+
+    // Display playlist size
+    public static void displayPlaylistSize() {
+
+        System.out.println("\n====== PLAYLIST SIZE ======");
+        System.out.println("Total Number of Songs: " + playlist.size());
+        System.out.println("===========================");
+    }
+
+    // Get integer input safely
+    public static int getIntInput(String message) {
+
+        while (true) {
+
+            System.out.print(message);
+
+            try {
+
+                return Integer.parseInt(scanner.nextLine());
+
+            } catch (NumberFormatException e) {
+
+                System.out.println(
+                        "Invalid input. Please enter a number."
+                );
+            }
+        }
+    }
+
+    // Get String input
+    public static String getStringInput(String message) {
+
+        System.out.print(message);
+
+        return scanner.nextLine().trim();
+    }
+}
