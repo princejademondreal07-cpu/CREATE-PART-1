@@ -1,0 +1,430 @@
+import java.util.Scanner;
+
+// Student class
+class Student {
+    private String studentId;
+    private String studentName;
+    private String course;
+    private int yearLevel;
+
+    public Student(String studentId, String studentName, String course, int yearLevel) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.course = course;
+        this.yearLevel = yearLevel;
+    }
+
+    public String getStudentId() {
+        return studentId;
+    }
+
+    public String getStudentName() {
+        return studentName;
+    }
+
+    public String getCourse() {
+        return course;
+    }
+
+    public int getYearLevel() {
+        return yearLevel;
+    }
+
+    public void setStudentName(String studentName) {
+        this.studentName = studentName;
+    }
+
+    public void setCourse(String course) {
+        this.course = course;
+    }
+
+    public void setYearLevel(int yearLevel) {
+        this.yearLevel = yearLevel;
+    }
+
+    public void display() {
+        System.out.println("Student ID   : " + studentId);
+        System.out.println("Student Name : " + studentName);
+        System.out.println("Course       : " + course);
+        System.out.println("Year Level   : " + yearLevel);
+    }
+}
+
+
+// Dynamic Array ADT
+class DynamicArray {
+    private Student[] students;
+    private int size;
+
+    // Initial capacity is 5
+    public DynamicArray() {
+        students = new Student[5];
+        size = 0;
+    }
+
+    // Add a student
+    public void add(Student student) {
+        // Check if the array is full
+        if (size == students.length) {
+            resize();
+        }
+
+        students[size] = student;
+        size++;
+    }
+
+    // Increase array capacity
+    private void resize() {
+        int oldCapacity = students.length;
+        int newCapacity = oldCapacity * 2;
+
+        Student[] newStudents = new Student[newCapacity];
+
+        // Copy old elements to the new array
+        for (int i = 0; i < size; i++) {
+            newStudents[i] = students[i];
+        }
+
+        students = newStudents;
+
+        System.out.println("Array is full.");
+        System.out.println("Capacity increased from "
+                + oldCapacity + " to " + newCapacity + ".");
+    }
+
+    // Get student at a specific index
+    public Student get(int index) {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+
+        return students[index];
+    }
+
+    // Update student at a specific index
+    public void set(int index, Student student) {
+        if (index >= 0 && index < size) {
+            students[index] = student;
+        }
+    }
+
+    // Search student using Student ID
+    public Student search(String studentId) {
+        for (int i = 0; i < size; i++) {
+            if (students[i].getStudentId().equalsIgnoreCase(studentId)) {
+                return students[i];
+            }
+        }
+
+        return null;
+    }
+
+    // Get index of student using Student ID
+    public int searchIndex(String studentId) {
+        for (int i = 0; i < size; i++) {
+            if (students[i].getStudentId().equalsIgnoreCase(studentId)) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // Remove student using index
+    public void remove(int index) {
+        if (index < 0 || index >= size) {
+            return;
+        }
+
+        // Shift elements to the left
+        for (int i = index; i < size - 1; i++) {
+            students[i] = students[i + 1];
+        }
+
+        // Remove the duplicate reference at the end
+        students[size - 1] = null;
+
+        size--;
+    }
+
+    // Return current number of students
+    public int size() {
+        return size;
+    }
+
+    // Return current array capacity
+    public int capacity() {
+        return students.length;
+    }
+
+    // Check if array is empty
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    // Display all students
+    public void display() {
+        if (isEmpty()) {
+            System.out.println("No student records found.");
+            return;
+        }
+
+        System.out.println("\n========== STUDENT RECORDS ==========");
+
+        for (int i = 0; i < size; i++) {
+            System.out.println("\nStudent " + (i + 1));
+            System.out.println("-------------------------------------");
+            students[i].display();
+        }
+
+        System.out.println("=====================================");
+    }
+}
+
+
+// Main class
+public class StudentRecordManager {
+
+    static Scanner scanner = new Scanner(System.in);
+    static DynamicArray studentList = new DynamicArray();
+
+    public static void main(String[] args) {
+
+        int choice;
+
+        do {
+            displayMenu();
+            choice = getIntInput("Enter your choice: ");
+
+            switch (choice) {
+                case 1:
+                    addStudent();
+                    break;
+
+                case 2:
+                    displayStudents();
+                    break;
+
+                case 3:
+                    searchStudent();
+                    break;
+
+                case 4:
+                    updateStudent();
+                    break;
+
+                case 5:
+                    removeStudent();
+                    break;
+
+                case 6:
+                    displayArrayInformation();
+                    break;
+
+                case 7:
+                    System.out.println("\nThank you for using Student Record Manager!");
+                    break;
+
+                default:
+                    System.out.println("\nInvalid choice. Please select 1-7.");
+            }
+
+        } while (choice != 7);
+
+        scanner.close();
+    }
+
+    // Display menu
+    public static void displayMenu() {
+        System.out.println("\n================================");
+        System.out.println("     STUDENT RECORD MANAGER");
+        System.out.println("================================");
+        System.out.println("1. Add Student");
+        System.out.println("2. Display Students");
+        System.out.println("3. Search Student");
+        System.out.println("4. Update Student");
+        System.out.println("5. Remove Student");
+        System.out.println("6. Display Array Information");
+        System.out.println("7. Exit");
+        System.out.println("================================");
+    }
+
+    // Add student
+    public static void addStudent() {
+        System.out.println("\n========== ADD STUDENT ==========");
+
+        String studentId;
+
+        // Validate unique Student ID
+        while (true) {
+            studentId = getStringInput("Enter Student ID: ");
+
+            if (studentId.isEmpty()) {
+                System.out.println("Student ID cannot be empty.");
+            } else if (studentList.search(studentId) != null) {
+                System.out.println("Student ID already exists. Please enter another ID.");
+            } else {
+                break;
+            }
+        }
+
+        String studentName = getStringInput("Enter Student Name: ");
+        String course = getStringInput("Enter Course: ");
+
+        int yearLevel;
+
+        while (true) {
+            yearLevel = getIntInput("Enter Year Level: ");
+
+            if (yearLevel >= 1 && yearLevel <= 6) {
+                break;
+            }
+
+            System.out.println("Year Level must be between 1 and 6.");
+        }
+
+        Student student = new Student(
+                studentId,
+                studentName,
+                course,
+                yearLevel
+        );
+
+        studentList.add(student);
+
+        System.out.println("\nStudent added successfully!");
+    }
+
+    // Display all students
+    public static void displayStudents() {
+        studentList.display();
+    }
+
+    // Search student
+    public static void searchStudent() {
+        System.out.println("\n========== SEARCH STUDENT ==========");
+
+        String studentId = getStringInput("Enter Student ID to search: ");
+
+        Student student = studentList.search(studentId);
+
+        if (student != null) {
+            System.out.println("\nStudent found!");
+            System.out.println("-------------------------------------");
+            student.display();
+            System.out.println("-------------------------------------");
+        } else {
+            System.out.println("\nStudent not found.");
+        }
+    }
+
+    // Update student
+    public static void updateStudent() {
+        System.out.println("\n========== UPDATE STUDENT ==========");
+
+        String studentId = getStringInput("Enter Student ID to update: ");
+
+        int index = studentList.searchIndex(studentId);
+
+        if (index == -1) {
+            System.out.println("\nStudent not found.");
+            return;
+        }
+
+        Student student = studentList.get(index);
+
+        System.out.println("\nCurrent Information:");
+        System.out.println("-------------------------------------");
+        student.display();
+        System.out.println("-------------------------------------");
+
+        System.out.println("\nEnter new information:");
+
+        String newName = getStringInput("Enter Student Name: ");
+        String newCourse = getStringInput("Enter Course: ");
+
+        int newYearLevel;
+
+        while (true) {
+            newYearLevel = getIntInput("Enter Year Level: ");
+
+            if (newYearLevel >= 1 && newYearLevel <= 6) {
+                break;
+            }
+
+            System.out.println("Year Level must be between 1 and 6.");
+        }
+
+        student.setStudentName(newName);
+        student.setCourse(newCourse);
+        student.setYearLevel(newYearLevel);
+
+        System.out.println("\nStudent information updated successfully!");
+    }
+
+    // Remove student
+    public static void removeStudent() {
+        System.out.println("\n========== REMOVE STUDENT ==========");
+
+        String studentId = getStringInput("Enter Student ID to remove: ");
+
+        int index = studentList.searchIndex(studentId);
+
+        if (index == -1) {
+            System.out.println("\nStudent not found.");
+            return;
+        }
+
+        Student student = studentList.get(index);
+
+        System.out.println("\nStudent to be removed:");
+        System.out.println("-------------------------------------");
+        student.display();
+        System.out.println("-------------------------------------");
+
+        String confirmation;
+
+        while (true) {
+            confirmation = getStringInput("Are you sure you want to remove this student? (Y/N): ");
+
+            if (confirmation.equalsIgnoreCase("Y")) {
+                studentList.remove(index);
+                System.out.println("\nStudent removed successfully!");
+                break;
+            } else if (confirmation.equalsIgnoreCase("N")) {
+                System.out.println("\nRemove operation cancelled.");
+                break;
+            } else {
+                System.out.println("Please enter Y or N.");
+            }
+        }
+    }
+
+    // Display array information
+    public static void displayArrayInformation() {
+        System.out.println("\n====== ARRAY INFORMATION ======");
+        System.out.println("Current Number of Students : " + studentList.size());
+        System.out.println("Current Array Capacity     : " + studentList.capacity());
+        System.out.println("===============================");
+    }
+
+    // Get integer input safely
+    public static int getIntInput(String message) {
+
+        while (true) {
+            System.out.print(message);
+
+            try {
+                return Integer.parseInt(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    // Get String input
+    public static String getStringInput(String message) {
+        System.out.print(message);
+        return scanner.nextLine().trim();
+    }
+}
